@@ -1,6 +1,6 @@
 # AI Text Classification and Evaluation 
 
-Web application for interactively evaluating text classifier performance.
+AI Text Classifier & Evaluator is a web application that utilizes binary text classification and a supervised learning model to classify a text sequence into one of two classes. The AI model utilizes various techniques & algorithms such as TF-IDF and Decision Tree to ensure reliable and precise classification results. Additionally, The web application also provides an interactive evaluation of the text classifier's performance. The user uploads a text document (webpage, tweet, docx file, URL, etc.), which is then processed by the classifier. The resulting classification is displayed to the user, with relevant keywords highlighted. Users can agree/disagree with the result, add/remove highlights, and save the classified text with annotations for future reference.
 
 # Getting Started with Create React App
 
