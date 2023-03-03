@@ -22,11 +22,24 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Available Scripts
 
-In the project directory, you can run:
+In the project (text-classification) directory, you can run:
+
+### `npm install` or `npm i`
+
+To install all dependencies
+
+### `npm rund dev` 
+
+To "concurrently" run client & server
+
+### `node server.js`
+
+To just run the server
+Open [http://localhost:5000](http://localhost:5000) to view it in your browser.
 
 ### `npm start`
 
-Runs the app in the development mode.\
+Runs the client app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 The page will reload when you make changes.\
