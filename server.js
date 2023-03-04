@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const port = process.env.PORT || 5000;
 
 app.use(cors());
 
@@ -11,7 +12,6 @@ app.get('/api', (req, res) => {
   res.json(data);
 });
 
-app.listen(5001, () => {
-  console.log('Server is listening on port 5001');
+app.listen(port, ()=> {
+  console.log(`Server is listening on port ${port}`)
 });
-

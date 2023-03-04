@@ -6,7 +6,7 @@ function App() {
 
   const handleClick = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api');
+      const response = await fetch('http://localhost:5000/api');
       const data = await response.text();
       console.log(data);
       setResponseData(data); // Update state with response data
