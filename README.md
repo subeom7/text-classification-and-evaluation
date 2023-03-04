@@ -26,15 +26,15 @@ In the project (text-classification) directory, you can run:
 
 ### `npm install` or `npm i`
 
-To install all dependencies
+Separately inside both ***client*** and ***Text-Classification-and-Evaluation*** directory to install all dependencies
 
-### `npm rund dev` 
+### `npm run dev` 
 
 To "concurrently" run client & server
 
 ### `node server.js`
 
-To just run the server
+To just run the server.\
 Open [http://localhost:5001](http://localhost:5001) to view it in your browser.
 
 ### `npm start`
