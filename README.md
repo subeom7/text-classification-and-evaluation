@@ -35,7 +35,7 @@ To "concurrently" run client & server
 ### `node server.js`
 
 To just run the server
-Open [http://localhost:5000](http://localhost:5000) to view it in your browser.
+Open [http://localhost:5001](http://localhost:5001) to view it in your browser.
 
 ### `npm start`
 
