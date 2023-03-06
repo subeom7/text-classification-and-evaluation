@@ -22,7 +22,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Available Scripts
 
-In the project (Text-Classification-and-Evaluation) directory, you can run:
+In the project (Text-Classification-and-Evaluation) directory, run:
 
 ### `npm install` or `npm i`
 
