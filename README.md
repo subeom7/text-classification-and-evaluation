@@ -24,6 +24,10 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project (Text-Classification-and-Evaluation) directory, run:
 
+### `pip install -r requirements.txt`
+
+To install all python dependencies
+
 ### `npm install` or `npm i`
 
 Separately inside both ***client*** and ***Text-Classification-and-Evaluation*** directory to install all dependencies
