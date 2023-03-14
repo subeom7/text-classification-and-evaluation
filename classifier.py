@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, request
+# from flask import Flask, request
 from sklearn.pipeline import Pipeline
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction.text import TfidfVectorizer
