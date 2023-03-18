@@ -10,7 +10,10 @@
     "eject": "cd client && react-scripts eject",
     "client": "cd client && npm start",
     "server": "node server.js",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
+    "flask": "python classifier.py",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\" \"npm run flask\"",
+    "pip-install": "python -m pip install -r requirements.txt",
+    "install-all": "npm run pip-install && npm install && cd client && npm install"
   },
   "author": "",
   "license": "ISC",
