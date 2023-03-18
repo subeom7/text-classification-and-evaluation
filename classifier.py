@@ -1,15 +1,15 @@
-import requests
-# from flask import Flask, request
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from sklearn.pipeline import Pipeline
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.datasets import fetch_20newsgroups
 
-response = requests.get('http://localhost:5001/api/getText')
-result = response.text
-# result = json_data['value']
-user_inputs = [result]
+app = Flask(__name__)
 
+# allows requests from different origins (e.g. different domains or ports) to access resources on the server
+CORS(app)
+# Load dataset and train the model
 categories = ['soc.religion.christian','comp.graphics', 'sci.med', 
               'sci.electronics','sci.space', 'sci.electronics', 
               'sci.crypt','rec.sport.baseball', 'rec.sport.hockey', 
@@ -24,7 +24,6 @@ text_clf = Pipeline([
 
 text_clf.fit(twenty_train.data, twenty_train.target)
 
-# Define a dictionary that maps category names to output strings
 category_map = {
     'soc.religion.christian': 'Religion/Christian',
     'comp.graphics': 'Computer/Graphics',
@@ -38,10 +37,18 @@ category_map = {
     'talk.politics.guns': 'Politics/Guns',
 }
 
+@app.route('/classify', methods=['POST'])
+def classify_text():
+    if request.method == 'POST':
+        # Get the text from the request
+        input_text = request.json['text']
+        user_inputs = [input_text]
 
-predicted = text_clf.predict(user_inputs)
+        # Perform the classification
+        predicted = text_clf.predict(user_inputs)
+        for doc, category in zip(user_inputs, predicted):
+            output_string = category_map[twenty_train.target_names[category]]
+            return jsonify(result=output_string)
 
-for doc, category in zip(user_inputs, predicted):
-    output_string = category_map[twenty_train.target_names[category]]
-    print('%s' % output_string)
-    #  print('%r => %s' % (doc, twenty_train.target_names[category]))
+if __name__ == '__main__':
+    app.run(debug=True, port=5002)

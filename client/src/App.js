@@ -1,31 +1,16 @@
 import { useState } from 'react';
+import axios from 'axios';
 import './App.css';
 
-
-
 function App() {
-  const [responseData, setResponseData] = useState(''); //hook
+  const [responseData, setResponseData] = useState('');
   const [inputText, setInputText] = useState('');
 
   const handleClick = async () => {
     try {
-      // Make POST request
-      const postOptions  =  {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ text: inputText })
-      }
-      await fetch('http://localhost:5001/api', postOptions);
-  
-      // Make GET request to retrieve data that was posted
-      const getOptions = {
-        method: 'GET',
-        headers: { 'Content-Type': 'text/plain' }
-      };
-      const response = await fetch('http://localhost:5001/result', getOptions);
-      const data = await response.text();
+      // Make POST request to the Flask API
+      const response = await axios.post('http://localhost:5002/classify', { text: inputText });
+      const data = response.data;
       console.log(data);
       setResponseData(data); // Update state with response data
     } catch (error) {
@@ -48,7 +33,9 @@ function App() {
         <input id="text-input" type="text" value={inputText} onChange={handleInputChange} placeholder="Type here..." style={{ fontSize: '20px', padding: '10px', borderRadius: '10px', border: '2px solid #ccc', backgroundColor: '#F5F5F5', color: 'black', boxShadow: '0px 4px 5px rgba(0, 0, 0, 0.25)', marginLeft: '100px', width: '500px', height: '100px', resize: 'vertical' }} />
         <button style={{ fontSize: '20px', padding: '10px 20px', borderRadius: '10px', border: 'none', backgroundColor: '#4CAF50', color: 'white', boxShadow: '0px 4px 5px rgba(0, 0, 0, 0.25)', marginLeft: '10px' }} onClick={handleClick}>Submit</button>
       </div>
-      <p style={{ fontSize: '24px', padding: '20px', backgroundColor: '#F5F5F5', borderRadius: '10px', boxShadow: '0px 4px 5px rgba(0, 0, 0, 0.25)' }}>{`Result: ${responseData}`}</p>
+      {responseData && (
+      <p style={{ fontSize: '24px', padding: '20px', backgroundColor: '#F5F5F5', borderRadius: '10px', boxShadow: '0px 4px 5px rgba(0, 0, 0, 0.25)' }}>{`Result: ${responseData.result}`}</p>
+      )}
     </div>
   );
   
