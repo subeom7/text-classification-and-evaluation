@@ -1,3 +1,4 @@
 scikit-learn==1.2.1
 Flask==2.2.3
 Flask-Cors==3.0.10
+joblib==1.2.0
