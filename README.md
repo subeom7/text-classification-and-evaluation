@@ -24,13 +24,17 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project (Text-Classification-and-Evaluation) directory, run:
 
-### `npm install` or `npm i`
+### `npm run install-all`
 
-Separately inside both ***client*** and ***Text-Classification-and-Evaluation*** directory to install all dependencies
+This command runs `npm install` and `pip install -r requirements.txt` to install all project dependencies. 
+
+### `npm install` & `pip install -r requirements.txt inside`
+
+If the above command does not work, run `npm install` and `pip install -r requirements.txt` inside ***Text-Classification-and-Evaluation*** directory and `cd client` directory and run `npm install` again.
 
 ### `npm run dev` 
 
-To "concurrently" run client & server
+To "concurrently" run client & server. Make sure to run this command inside of project (***Text-Classification-and-Evaluation***) directory
 
 ### `node server.js`
 
