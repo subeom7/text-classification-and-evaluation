@@ -11,6 +11,10 @@
 # production
 /build
 
+# binary files (classifier model)
+text_classifier.joblib
+twenty_train.joblib
+
 # misc
 .DS_Store
 .env.local
