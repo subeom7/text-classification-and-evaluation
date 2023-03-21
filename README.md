@@ -28,7 +28,7 @@ In the project (Text-Classification-and-Evaluation) directory, run:
 
 This command runs `npm install` and `pip install -r requirements.txt` to install all project dependencies. 
 
-### `npm install` & `pip install -r requirements.txt inside`
+### `npm install` & `pip install -r requirements.txt`
 
 If the above command does not work, run `npm install` and `pip install -r requirements.txt` inside ***Text-Classification-and-Evaluation*** directory and `cd client` directory and run `npm install` again.
 
