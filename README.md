@@ -12,6 +12,7 @@ AI Text Classifier & Evaluator is a web application that utilizes binary text cl
 <a href="https://reactjs.org/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/react-colored.svg" width="36" height="36" alt="React" /></a>
 <a href="https://nodejs.org/en/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/nodejs-colored.svg" width="36" height="36" alt="NodeJS" /></a>
 <a href="https://expressjs.com/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/express-colored.svg" width="36" height="36" alt="Express" /></a>
+<a href="https://flask.palletsprojects.com/en/2.2.x/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/flask.svg" width="36" height="36" alt="Flask" /></a>
 <a href="https://www.mongodb.com/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/mongodb-colored.svg" width="36" height="36" alt="MongoDB" /></a>
 <a href="https://git-scm.com/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/git-colored.svg" width="36" height="36" alt="Git" /></a>
 </p>
@@ -28,7 +29,7 @@ In the project (Text-Classification-and-Evaluation) directory, run:
 
 This command runs `npm install` and `pip install -r requirements.txt` to install all project dependencies. 
 
-### `npm install` & `pip install -r requirements.txt inside`
+### `npm install` & `pip install -r requirements.txt`
 
 If the above command does not work, run `npm install` and `pip install -r requirements.txt` inside ***Text-Classification-and-Evaluation*** directory and `cd client` directory and run `npm install` again.
 
@@ -39,7 +40,7 @@ To "concurrently" run client & server. Make sure to run this command inside of p
 ### `node server.js`
 
 To just run the server.\
-Open [http://localhost:5001](http://localhost:5001) to view it in your browser.
+Open [http://localhost:5002](http://localhost:5002) to view it in your browser.
 
 ### `npm start`
 
