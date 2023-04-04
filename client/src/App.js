@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { GoogleLogin } from 'react-google-login';
 import './App.css';
-
 
 function App() {
  const [responseData, setResponseData] = useState('');
@@ -23,8 +23,33 @@ function App() {
    setInputText(event.target.value);
  };
 
+ const responseGoogle = async (response) => {
+  if (response.error) {
+    console.error("Google Login Error:", response.error);
+    return;
+  }
+  // Send the received token to the Flask backend for validation
+  try {
+    const result = await axios.post("http://localhost:5002/auth/google", {
+      token: response.tokenId,
+    });
+    console.log("Login success:", result.data);
+  } catch (error) {
+    console.error("Login error:", error);
+  }
+};
+
+
  return (
    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+       <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
+        <GoogleLogin
+          clientId={"845464112864-v3o86f5qj5mpbt4jf7qf8ji2p6qjj6lt.apps.googleusercontent.com"}
+          buttonText="Login with Google"
+          onSuccess={responseGoogle}
+          onFailure={responseGoogle}
+        />
+      </div>
      <div style={{ fontSize: '24px', padding: '10px', marginBottom: '5px', fontWeight: 'bold' }}>Example Inputs:</div>
      <div style={{ fontSize: '20px', padding: '10px', marginBottom: '5px' }}>"Dementia: Vitamin D supplements linked to 35% lower incidence."</div>
      <div style={{ fontSize: '20px', padding: '10px', marginBottom: '5px' }}>"Crypto Analytics Firm Explains Why Dogecoin Is Impressive."</div>
@@ -42,6 +67,7 @@ function App() {
         <p style={{ fontSize: '24px', padding: '20px', backgroundColor: '#F5F5F5', borderRadius: '10px', boxShadow: '0px 4px 5px rgba(0, 0, 0, 0.25)', overflowWrap: 'break-word', whiteSpace: 'pre-wrap', maxHeight: '300px', overflowY: 'auto' }}>{responseData.words}</p>
       )}
     </div>
+    
   );
 }
 
