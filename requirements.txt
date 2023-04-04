@@ -2,3 +2,6 @@ scikit-learn==1.2.1
 Flask==2.2.3
 Flask-Cors==3.0.10
 joblib==1.2.0
+requests-oauthlib==1.1.0
+oauthlib==2.1.0
+Flask-OAuthlib==0.9.6
