@@ -14,6 +14,7 @@
 # binary files (classifier model)
 text_classifier.joblib
 twenty_train.joblib
+/__pycache__
 
 # misc
 .DS_Store
@@ -21,6 +22,7 @@ twenty_train.joblib
 .env.development.local
 .env.test.local
 .env.production.local
+.env
 
 npm-debug.log*
 yarn-debug.log*
