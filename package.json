@@ -9,9 +9,8 @@
     "test": "cd client && react-scripts test",
     "eject": "cd client && react-scripts eject",
     "client": "cd client && npm start",
-    "server": "node server.js",
     "flask": "python server.py",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\" \"npm run flask\"",
+    "dev": "concurrently --kill-others-on-fail \"npm run client\" \"npm run flask\"",
     "pip-install": "python -m pip install -r requirements.txt",
     "install-all": "npm run pip-install && python train_and_save_model.py && npm install && cd client && npm install"
   },
