@@ -11,6 +11,7 @@ db = client.User_History
 
 def save_classification_history(user_id, input_text, output):
     history_collection = db.User_History
+    history_collection.create_index("user_id")
     history_record = {
         "user_id": user_id,
         "input_text": input_text,
