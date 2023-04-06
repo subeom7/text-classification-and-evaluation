@@ -1,13 +1,6 @@
-#FLASK API Version
 import joblib
 import re
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-
-app = Flask(__name__)
-
-# allows requests from different origins (e.g. different domains or ports) to access resources on the server
-CORS(app)
+from database import save_classification_history
 
 # Load the saved model and the twenty_train object
 text_clf = joblib.load('text_classifier.joblib')
@@ -55,24 +48,21 @@ def find_important_words(sentence, text_clf, original_class, top_n=5):
     # Return the top N important words and their importance percentage
     return [(re.sub(r'\W', '', word).capitalize()) + "(" + f"{round(diff / total_importance * 100)}%" + ")" for word, diff in sorted_words[:top_n]]
 
+def classify(input_text, user_id=None):
+    user_inputs = [input_text]
 
-@app.route('/classify', methods=['POST'])
-def classify_text():
-    if request.method == 'POST':
-        # Get the text from the request
-        input_text = request.json['text']
-        user_inputs = [input_text]
+    # Calculate top_n based on the length of the input text
+    num_words = len(input_text.split())
+    topN = max(3, int(num_words * 0.1))  # Set top_n to 10% of the number of words, with a minimum of 1
 
-        # Calculate top_n based on the length of the input text
-        num_words = len(input_text.split())
-        topN = max(3, int(num_words * 0.1))  # Set top_n to 10% of the number of words, with a minimum of 1
+    # Perform the classification
+    predicted = text_clf.predict([input_text])
+    predicted_class = int(predicted[0])  # Convert the predicted class to an integer
+    important_words = find_important_words(input_text, text_clf, predicted_class, top_n=topN)
+    output_string = category_map[twenty_train.target_names[predicted_class]]
 
-         # Perform the classification
-        predicted = text_clf.predict([input_text])
-        predicted_class = int(predicted[0])  # Convert the predicted class to an integer
-        important_words = find_important_words(input_text, text_clf, predicted_class, top_n=topN)
-        output_string = category_map[twenty_train.target_names[predicted_class]]
-        return jsonify(result=output_string, words='\n'.join(important_words))
+    # Save the classification history for the user if user_id exists
+    if user_id:
+        save_classification_history(user_id, input_text, output_string)
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5002)
+    return output_string, important_words
