@@ -47,7 +47,8 @@ function App() {
   const handleClick = async () => {
     try {
       // Make POST request to the Flask API
-      const response = await axios.post('http://localhost:5002/classify', { text: inputText });
+      const response = await axios.post('http://localhost:5002/classify', { text: inputText, user_id: user.sub });
+
       const data = response.data;
       console.log(data);
       setResponseData(data); // Update state with response data
