@@ -1,21 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import GoogleSignIn from './components/GoogleSignIn';
 import UserHistory from './components/UserHistory';
 import InputForm from './components/InputForm';
 import OutputDisplay from './components/OutputDisplay';
 import './App.css';
+import UserPrediction from './components/UserPrediction';
 
 function App() {
   const [responseData, setResponseData] = useState('');
   const [inputText, setInputText] = useState('');
   const [userHistory, setUserHistory] = useState([]);
   const [user, setUser] = useState({});
+  const [selectValue, setSelectValue] = useState("");
+  const fileInputRef = useRef(null);
 
   function handleSignOut(event) {
     setUser({});
     document.getElementById("signInDiv").hidden = false;
   }
+
+  const handleFileInputChange = () => {
+    const file = fileInputRef.current.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      setInputText(reader.result); // Update inputText state with file contents
+    };
+    reader.readAsText(file);
+  };
 
   useEffect(() => {
     const fetchUserHistory = async () => {
@@ -81,7 +93,8 @@ function App() {
       <div style={{ fontSize: '20px', padding: '10px', marginBottom: '5px' }}>"Vitamin D supplement linked to lower dementia incidence."</div>
       <div style={{ fontSize: '20px', padding: '10px', marginBottom: '5px' }}>"Crypto Analytics Firm Explains Why Dogecoin Is Impressive."</div>
       <div style={{ fontSize: '20px', padding: '10px', marginBottom: '5px' }}>"Tesla cuts prices of Model S and Model X vehicles."</div>
-      <InputForm inputText={inputText} handleInputChange={handleInputChange} handleClick={handleClick} />
+      <InputForm inputText={inputText} handleInputChange={handleInputChange} handleClick={handleClick} fileInputRef={fileInputRef} handleFileInputChange={handleFileInputChange}/>
+      <UserPrediction setSelectValue={setSelectValue} selectValue={selectValue} />
       <OutputDisplay responseData={responseData} />
     </div>
   );

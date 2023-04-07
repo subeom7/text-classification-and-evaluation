@@ -1,12 +1,13 @@
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
+import certifi
 
 load_dotenv()
 
 MONGODB_URI = os.environ["MONGODB_URI"]
 
-client = MongoClient(MONGODB_URI)
+client = MongoClient(MONGODB_URI, tlsCAFile=certifi.where())
 db = client.User_History
 
 def save_classification_history(user_id, input_text, output):
