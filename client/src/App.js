@@ -23,6 +23,58 @@ function App() {
   const textRef = useRef(null);
   let searchWords = responseData ? words2arr(responseData.words) : [];
 
+  const [files, setFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileContent, setFileContent] = useState("");
+
+  const containerStyle = {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'start',
+    position: 'absolute',
+    height: '100%',
+    width: '100%'
+  };
+
+  const uploadBoxStyle = {
+    width: '250px',
+    height: '700px',
+    border: '4px solid black',
+    backgroundColor: '#eefdff',
+    marginTop: '50px',
+    marginRight: '20px',
+    fontSize: '16px',
+    color: 'black',
+    textAlign: 'left',
+    padding: '5px',
+  };
+
+  const fileBoxStyle = {
+    border: "1px solid black",
+    padding: "10px",
+    margin: "10px",
+    cursor: "pointer",
+  };
+  
+
+  const handleFileUpload = (e) => {
+    const newFiles = [...e.target.files];
+    setFiles([...files, ...newFiles]);
+  };
+
+  const handleFileClick = (file) => {
+    setSelectedFile(file);
+
+    console.log(file);
+    console.log(files);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setFileContent(e.target.result);
+    };
+    reader.readAsText(file);
+  };
+
   useEffect(() => {
     const markInstance = new Mark(textRef.current);
     markInstance.unmark();
@@ -171,12 +223,45 @@ function App() {
             </div>
           )}
         </div>
+        <div style={{ position: "absolute", left: "0" }}>
+          <div style={containerStyle}>
+            <div style={uploadBoxStyle}>
+              <input
+                style={{ color: "transparent" }}
+                type="file"
+                multiple
+                onChange={handleFileUpload}
+              />
+              {files.map((file, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleFileClick(file, index)}
+                  style={{ ...fileBoxStyle }}
+                >
+                  {file.name}
+                </div>
+              ))}
+            </div>
+            {/* <div style={textBoxStyle}>
+        {selectedFile && (
+          <div>
+            <pre>{fileContent}</pre>
+          </div>
+        )}
+      </div> */}
 
-        <div style={{ position: "absolute", top: "-100px", left: "10px" }}>
-          {Object.keys(user).length !== 0 && (
-            <UserHistory userHistory={userHistory} />
-          )}
+            {/* <div style={userBoxStyle}>
+        <p>User Input</p>
+      </div> */}
+          </div>
         </div>
+
+        {/* <div style={{ position: "absolute", top: "-100px", left: "10px" }}>
+           {Object.keys(user).length !== 0 && (
+            
+            <UserHistory userHistory={userHistory} />
+          )} 
+        </div>  */}
       </div>
       <div
         style={{
@@ -197,6 +282,7 @@ function App() {
       <div style={{ fontSize: "20px", padding: "10px", marginBottom: "5px" }}>
         "Tesla cuts prices of Model S and Model X vehicles."
       </div>
+
       <InputForm
         inputText={inputText}
         handleInputChange={handleInputChange}
@@ -206,14 +292,24 @@ function App() {
       />
       <div
         ref={textRef}
-        style={{ fontFamily: "Courier", marginTop: "10px", fontSize: '24px', padding: '20px', backgroundColor: '#F5F5F5', borderRadius: '10px', boxShadow: '0px 4px 5px rgba(0, 0, 0, 0.25)', overflowWrap: 'break-word', whiteSpace: 'pre-wrap', width: "800px",
-        minHeight: "150px",
-        resize: "none",
-        overflow: "auto"}}
+        style={{
+          fontFamily: "Courier",
+          marginTop: "10px",
+          fontSize: "24px",
+          padding: "20px",
+          backgroundColor: "#F5F5F5",
+          borderRadius: "10px",
+          boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
+          overflowWrap: "break-word",
+          whiteSpace: "pre-wrap",
+          width: "800px",
+          minHeight: "150px",
+          resize: "none",
+          overflow: "auto",
+        }}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
-        
       >
         {inputText}
       </div>
@@ -222,8 +318,6 @@ function App() {
         selectValue={selectValue}
       />
       <OutputDisplay responseData={responseData} />
-
-      
     </div>
   );
 }
