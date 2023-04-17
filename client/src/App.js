@@ -7,6 +7,7 @@ import OutputDisplay from "./components/OutputDisplay";
 import "./App.css";
 import UserPrediction from "./components/UserPrediction";
 import Mark from "mark.js";
+import styles from './components/Button.module.css';
 
 function App() {
   const [responseData, setResponseData] = useState("");
@@ -121,8 +122,15 @@ function App() {
 
       setUserHistory([
         ...userHistory,
-        { input_text: inputText, output: data.result },
+        {
+          _id: data.document_id,
+          user_id: user.sub,
+          input_text: inputText,
+          classifier_result: data.result,
+          important_words: data.words,
+        },
       ]);
+      
     } catch (error) {
       console.error(error);
     }
@@ -131,6 +139,30 @@ function App() {
   const handleInputChange = (event) => {
     setInputText(event.target.value);
   };
+
+  const handleImageError = (e) => {
+    e.target.onerror = null; // Prevent infinite loop if the default image URL also fails
+    e.target.src = 'https://path/to/your/default/image.png';
+  };
+
+  const handleDeleteHistory = async (documentId) => {
+    try {
+      await axios.delete(`http://localhost:5002/history/delete/${user.sub}/${documentId}`);
+      setUserHistory(userHistory.filter((entry) => entry._id !== documentId));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  const handleClearHistory = async () => {
+    try {
+      await axios.delete(`http://localhost:5002/history/clear/${user.sub}`);
+      setUserHistory([]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
 
   return (
     <div
@@ -146,35 +178,32 @@ function App() {
         <GoogleSignIn setUser={setUser} />
 
         <div className="App">
-          {user && (
-            <div style={{ position: "absolute", top: "10px", right: "10px" }}>
-              <div style={{ display: "grid", alignItems: "center" }}>
-                <img src={user.picture}></img>
-                <h3>{user.name}</h3>
-                {Object.keys(user).length !== 0 && (
-                  <button
-                    style={{
-                      fontSize: "12px",
-                      padding: "10px 20px",
-                      borderRadius: "10px",
-                      border: "none",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
-                    }}
-                    onClick={(e) => handleSignOut(e)}
-                  >
-                    Sign Out
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+        {user && (
+          <div style={{ position: "absolute", top: "10px", right: "10px" }}>
+            <div className={`${styles["user-info"]}`}>
+              <img
+                src={user.picture}
+                onError={handleImageError}
+                style={{ width: "50px", borderRadius: "50%" }}
+              ></img>
+              <h3 style={{ margin: "0" }}>{user.name}</h3>
+              {Object.keys(user).length !== 0 && (
+                <button
+                  className={styles.button}
+                  onClick={(e) => handleSignOut(e)}
+                >
+            Sign Out
+          </button>
+        )}
+      </div>
+    </div>
+  )}
+</div>
+
 
         <div style={{ position: "absolute", top: "-100px", left: "10px" }}>
           {Object.keys(user).length !== 0 && (
-            <UserHistory userHistory={userHistory} />
+            <UserHistory userHistory={userHistory} onDeleteHistory={handleDeleteHistory} onClearHistory={handleClearHistory} />
           )}
         </div>
       </div>
