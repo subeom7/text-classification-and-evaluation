@@ -60,9 +60,10 @@ def classify(input_text, user_id=None):
     predicted_class = int(predicted[0])  # Convert the predicted class to an integer
     important_words = find_important_words(input_text, text_clf, predicted_class, top_n=topN)
     output_string = category_map[twenty_train.target_names[predicted_class]]
+    document_id = None
 
     # Save the classification history for the user if user_id exists
     if user_id:
-        save_classification_history(user_id, input_text, output_string)
+        document_id = save_classification_history(user_id, input_text, output_string, important_words)
 
-    return output_string, important_words
+    return output_string, important_words, document_id
