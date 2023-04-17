@@ -7,6 +7,7 @@ import OutputDisplay from "./components/OutputDisplay";
 import "./App.css";
 import UserPrediction from "./components/UserPrediction";
 import Mark from "mark.js";
+import JSZip from "jszip";
 
 function App() {
   const [responseData, setResponseData] = useState("");
@@ -19,61 +20,10 @@ function App() {
   const [highlightedText, setHighlightedText] = useState([]);
   const [mouseDown, setMouseDown] = useState(false);
 
+  const [results, setResults] = useState([]);
   const [startPos, setStartPos] = useState(null);
   const textRef = useRef(null);
   let searchWords = responseData ? words2arr(responseData.words) : [];
-
-  const [files, setFiles] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [fileContent, setFileContent] = useState("");
-
-  const containerStyle = {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'start',
-    position: 'absolute',
-    height: '100%',
-    width: '100%'
-  };
-
-  const uploadBoxStyle = {
-    width: '250px',
-    height: '700px',
-    border: '4px solid black',
-    backgroundColor: '#eefdff',
-    marginTop: '50px',
-    marginRight: '20px',
-    fontSize: '16px',
-    color: 'black',
-    textAlign: 'left',
-    padding: '5px',
-  };
-
-  const fileBoxStyle = {
-    border: "1px solid black",
-    padding: "10px",
-    margin: "10px",
-    cursor: "pointer",
-  };
-  
-
-  const handleFileUpload = (e) => {
-    const newFiles = [...e.target.files];
-    setFiles([...files, ...newFiles]);
-  };
-
-  const handleFileClick = (file) => {
-    setSelectedFile(file);
-
-    console.log(file);
-    console.log(files);
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setFileContent(e.target.result);
-    };
-    reader.readAsText(file);
-  };
 
   useEffect(() => {
     const markInstance = new Mark(textRef.current);
@@ -91,6 +41,11 @@ function App() {
       });
     });
   }, [searchWords, highlightedText]);
+
+  function handleListItemClick(index, string) {
+    setInputText(string);
+    setResponseData(results[index]);
+  }
 
   const handleMouseDown = (event) => {
     setMouseDown(true);
@@ -162,23 +117,63 @@ function App() {
 
   const handleClick = async () => {
     try {
-      const response = await axios.post("http://localhost:5002/classify", {
-        text: inputText,
-        user_id: user.sub,
-      });
+      const resultsTemp = [];
 
-      const data = response.data;
-      console.log(data);
-      setResponseData(data);
+      for (const input of fileData) {
+        const response = await axios.post("http://localhost:5002/classify", {
+          text: input,
+          user_id: user.sub,
+        });
 
-      setUserHistory([
-        ...userHistory,
-        { input_text: inputText, output: data.result },
-      ]);
+        const data = response.data;
+        //console.log(data);
+
+        resultsTemp.push(data);
+
+        setUserHistory([
+          ...userHistory,
+          { input_text: input, output: data.result },
+        ]);
+      }
+      setResults(resultsTemp);
+      setResponseData(resultsTemp[0]);
+      console.log(resultsTemp[0]);
     } catch (error) {
       console.error(error);
     }
   };
+
+  const [fileData, setFileData] = useState([]);
+  const [filenameData, setFilenameData] = useState([]);
+  function handleFileUpload(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = async function (event) {
+      const zip = await JSZip.loadAsync(event.target.result);
+      const arrayOfStrings = [];
+      const arrayOfFilenames = [];
+
+      for (const filename in zip.files) {
+        if (filename.endsWith(".txt")) {
+          const textFile = zip.files[filename];
+          const text = await textFile.async("text");
+          const strings = text.split("\n");
+          arrayOfStrings.push(...strings);
+          arrayOfFilenames.push(filename);
+        }
+      }
+      setFileData(arrayOfStrings);
+      setFilenameData(arrayOfFilenames);
+    };
+
+    reader.readAsArrayBuffer(file);
+  }
+
+  const inputTexts = [
+    "Tesla cuts prices of Model S and Model X vehicles.",
+    "Vitamin D supplement linked to lower dementia incidence.",
+  ];
 
   const handleInputChange = (event) => {
     setInputText(event.target.value);
@@ -223,45 +218,12 @@ function App() {
             </div>
           )}
         </div>
-        <div style={{ position: "absolute", left: "0" }}>
-          <div style={containerStyle}>
-            <div style={uploadBoxStyle}>
-              <input
-                style={{ color: "transparent" }}
-                type="file"
-                multiple
-                onChange={handleFileUpload}
-              />
-              {files.map((file, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleFileClick(file, index)}
-                  style={{ ...fileBoxStyle }}
-                >
-                  {file.name}
-                </div>
-              ))}
-            </div>
-            {/* <div style={textBoxStyle}>
-        {selectedFile && (
-          <div>
-            <pre>{fileContent}</pre>
-          </div>
-        )}
-      </div> */}
 
-            {/* <div style={userBoxStyle}>
-        <p>User Input</p>
-      </div> */}
-          </div>
-        </div>
-
-        {/* <div style={{ position: "absolute", top: "-100px", left: "10px" }}>
-           {Object.keys(user).length !== 0 && (
-            
+        <div style={{ position: "absolute", top: "-100px", left: "10px" }}>
+          {Object.keys(user).length !== 0 && (
             <UserHistory userHistory={userHistory} />
-          )} 
-        </div>  */}
+          )}
+        </div>
       </div>
       <div
         style={{
@@ -282,13 +244,16 @@ function App() {
       <div style={{ fontSize: "20px", padding: "10px", marginBottom: "5px" }}>
         "Tesla cuts prices of Model S and Model X vehicles."
       </div>
-
       <InputForm
         inputText={inputText}
         handleInputChange={handleInputChange}
         handleClick={handleClick}
         fileInputRef={fileInputRef}
         handleFileInputChange={handleFileInputChange}
+        handleListItemClick={handleListItemClick}
+        fileData={fileData}
+        handleFileUpload={handleFileUpload}
+        filenameData={filenameData}
       />
       <div
         ref={textRef}
@@ -317,7 +282,8 @@ function App() {
         setSelectValue={setSelectValue}
         selectValue={selectValue}
       />
-      <OutputDisplay responseData={responseData} />
+      <OutputDisplay responseData={responseData} results={results} />
+      <>{selectValue}</>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const OutputDisplay = ({ responseData }) => {
+const OutputDisplay = ({ responseData , results}) => {
   return (
     <>
       <div style={{ fontSize: '24px', padding: '10px', marginBottom: '-20px', fontWeight: 'bold' }}>Result:</div>
