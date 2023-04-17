@@ -6,10 +6,12 @@ const UserHistory = ({ userHistory, onDeleteHistory, onClearHistory }) => {
   const [deleteEntryId, setDeleteEntryId] = useState(null);
 
   const handleClearClick = () => {
+    setDeleteEntryId(null);
     setShowClearConfirmation(true);
   };
 
   const handleDeleteClick = (id) => {
+    setShowClearConfirmation(false);
     setDeleteEntryId(id);
   };
 
