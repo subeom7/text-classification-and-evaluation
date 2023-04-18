@@ -6,9 +6,15 @@ const InputForm = ({
   handleClick,
   fileInputRef,
   handleFileInputChange,
+  handleClickZip,
+  fileData,
+  handleListItemClick,
+  handleFileUpload,
+  filenameData,
 }) => {
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
+
       <textarea
         id="text-input"
         value={inputText}
@@ -38,28 +44,40 @@ const InputForm = ({
           flexDirection: "column",
         }}
       >
-        <input
-          type="file"
-          ref={fileInputRef}
-          style={{ display: "none" }}
-          onChange={handleFileInputChange}
-        />
-        <button
-          style={{
-            fontSize: "24px",
-            padding: "10px 20px",
-            borderRadius: "10px",
-            border: "none",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
-            marginLeft: "10px",
-            marginBottom: "10px",
-          }}
-          onClick={() => fileInputRef.current.click()}
-        >
-          Upload
-        </button>
+        <div style={{marginRight: "1px"}}>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileUpload}
+          />
+          <button
+            style={{
+              fontSize: "24px",
+              padding: "10px 20px",
+              borderRadius: "10px",
+              border: "none",
+              backgroundColor: "#4CAF50",
+              color: "white",
+              boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
+              marginLeft: "10px",
+              marginBottom: "10px",
+            }}
+            onClick={() => fileInputRef.current.click()}
+          >
+            Upload
+          </button>
+          <ul>
+            {fileData.map((string, index) => (
+              <li
+                key={index}
+                onClick={() => handleListItemClick(index, string)}
+              >
+                {filenameData[index]}
+              </li>
+            ))}
+          </ul>
+        </div>
         <button
           style={{
             fontSize: "24px",

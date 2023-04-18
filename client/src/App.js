@@ -8,6 +8,7 @@ import "./App.css";
 import UserPrediction from "./components/UserPrediction";
 import Mark from "mark.js";
 import styles from './components/Button.module.css';
+import JSZip from "jszip";
 
 function App() {
   const [responseData, setResponseData] = useState("");
@@ -23,6 +24,42 @@ function App() {
   const [startPos, setStartPos] = useState(null);
   const textRef = useRef(null);
   let searchWords = responseData ? words2arr(responseData.words) : [];
+
+  const [fileData, setFileData] = useState([]);
+  const [filenameData, setFilenameData] = useState([]);
+  const [results, setResults] = useState([]);
+
+  function handleFileUpload(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = async function (event) {
+      const zip = await JSZip.loadAsync(event.target.result);
+      const arrayOfStrings = [];
+      const arrayOfFilenames = [];
+
+      for (const filename in zip.files) {
+        if (filename.endsWith(".txt")) {
+          const textFile = zip.files[filename];
+          const text = await textFile.async("text");
+          const strings = text.split("\n");
+          arrayOfStrings.push(...strings);
+          arrayOfFilenames.push(filename);
+        }
+      }
+      setFileData(arrayOfStrings);
+      setFilenameData(arrayOfFilenames);
+
+      setInputText(arrayOfStrings[0]);
+    };
+
+    reader.readAsArrayBuffer(file);
+  }
+
+  function handleListItemClick(index, string) {
+    setInputText(string);
+    setResponseData(results[index]);
+  }
 
   useEffect(() => {
     const markInstance = new Mark(textRef.current);
@@ -82,15 +119,6 @@ function App() {
     return words;
   }
 
-  const handleFileInputChange = () => {
-    const file = fileInputRef.current.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      setInputText(reader.result); // Update inputText state with file contents
-    };
-    reader.readAsText(file);
-  };
-
   useEffect(() => {
     const fetchUserHistory = async () => {
       try {
@@ -111,26 +139,33 @@ function App() {
 
   const handleClick = async () => {
     try {
-      const response = await axios.post("http://localhost:5002/classify", {
-        text: inputText,
-        user_id: user.sub,
-      });
+      const resultsTemp = [];
 
-      const data = response.data;
-      console.log(data);
-      setResponseData(data);
-
-      setUserHistory([
-        ...userHistory,
-        {
-          _id: data.document_id,
+      for (const input of fileData) {
+        const response = await axios.post("http://localhost:5002/classify", {
+          text: input,
           user_id: user.sub,
-          input_text: inputText,
-          classifier_result: data.result,
-          important_words: data.words,
-        },
-      ]);
-      
+        });
+
+        const data = response.data;
+        //console.log(data);
+
+        resultsTemp.push(data);
+
+        setUserHistory([
+          ...userHistory,
+          {
+            _id: data.document_id,
+            user_id: user.sub,
+            input_text: inputText,
+            classifier_result: data.result,
+            important_words: data.words,
+          },
+        ]);
+      }
+      setResults(resultsTemp);
+      setResponseData(resultsTemp[0]);
+      console.log(resultsTemp[0]);
     } catch (error) {
       console.error(error);
     }
@@ -140,6 +175,7 @@ function App() {
     setInputText(event.target.value);
   };
 
+  
   const handleImageError = (e) => {
     e.target.onerror = null; // Prevent infinite loop if the default image URL also fails
     e.target.src = 'https://path/to/your/default/image.png';
@@ -231,7 +267,10 @@ function App() {
         handleInputChange={handleInputChange}
         handleClick={handleClick}
         fileInputRef={fileInputRef}
-        handleFileInputChange={handleFileInputChange}
+        handleFileUpload={handleFileUpload}
+        handleListItemClick={handleListItemClick}
+        filenameData={filenameData}
+        fileData={fileData}
       />
       <div
         ref={textRef}
@@ -250,8 +289,7 @@ function App() {
         setSelectValue={setSelectValue}
         selectValue={selectValue}
       />
-      <OutputDisplay responseData={responseData} />
-
+      <OutputDisplay responseData={responseData}/>
       
     </div>
   );
