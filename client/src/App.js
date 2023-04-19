@@ -28,6 +28,7 @@ function App() {
   const [fileData, setFileData] = useState([]);
   const [filenameData, setFilenameData] = useState([]);
   const [results, setResults] = useState([]);
+  const [showUserPrediction, setShowUserPrediction] = useState(false);
 
   function handleFileUpload(event) {
     const file = event.target.files[0];
@@ -137,7 +138,7 @@ function App() {
     }
   }, [user]);
 
-  const handleClick = async () => {
+  const handleClickSubmit = async () => {
     try {
       const response = await axios.post("http://localhost:5002/classify", {
         text: inputText,
@@ -148,6 +149,26 @@ function App() {
       const data = response.data;
       console.log(data);
       setResponseData(data);
+      setShowUserPrediction(true);
+      
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleClickSave = async () => {
+    try {
+      const response = await axios.post("http://localhost:5002/classify", {
+        text: inputText,
+        user_id: user.sub,
+        user_result: selectValue,
+      });
+  
+      const data = response.data;
+      console.log(data);
+      setResponseData(data);
+
+      const commaSeparatedHighlights = highlightedText.join(', ');
   
       setUserHistory([
         ...userHistory,
@@ -158,7 +179,7 @@ function App() {
           classifier_result: data.result,
           important_words: data.words,
           user_result: selectValue, 
-          user_highlight: highlightedText,
+          user_highlight: commaSeparatedHighlights,
         },
       ]);
       
@@ -207,6 +228,17 @@ function App() {
     const data = await response.json();
     console.log(data);
   }
+
+  function resetSession() {
+    setResponseData("");
+    setInputText("");
+    setSelectValue("");
+    setHighlightedText([]);
+    setFileData([]);
+    setFilenameData([]);
+    setResults([]);
+  }
+  
   
   
 
@@ -253,7 +285,7 @@ function App() {
           )}
         </div>
       </div>
-      <div
+      {/* <div
         style={{
           fontSize: "24px",
           padding: "10px",
@@ -262,7 +294,7 @@ function App() {
         }}
       >
         Example Inputs:
-      </div>
+      </div> */}
       <div style={{ fontSize: "20px", padding: "10px", marginBottom: "5px" }}>
         "Vitamin D supplement linked to lower dementia incidence."
       </div>
@@ -272,39 +304,90 @@ function App() {
       <div style={{ fontSize: "20px", padding: "10px", marginBottom: "5px" }}>
         "Tesla cuts prices of Model S and Model X vehicles."
       </div>
+      
       <InputForm
         inputText={inputText}
         handleInputChange={handleInputChange}
-        handleClick={handleClick}
+        handleClickSubmit={handleClickSubmit}
+        handleClickSave={handleClickSave}
         fileInputRef={fileInputRef}
         handleFileUpload={handleFileUpload}
         handleListItemClick={handleListItemClick}
         filenameData={filenameData}
         fileData={fileData}
       />
-      <div
-        ref={textRef}
-        style={{ fontFamily: "Courier", marginTop: "10px", fontSize: '24px', padding: '20px', backgroundColor: '#F5F5F5', borderRadius: '10px', boxShadow: '0px 4px 5px rgba(0, 0, 0, 0.25)', overflowWrap: 'break-word', whiteSpace: 'pre-wrap', width: "800px",
-        minHeight: "150px",
-        resize: "none",
-        overflow: "auto"}}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseMove={handleMouseMove}
-        
-      >
-        {inputText}
-      </div>
+           
+      
+      {showUserPrediction && (
+      <OutputDisplay responseData={responseData}/>
+      )}
+
+{showUserPrediction && (
       <UserPrediction
         selectValue={selectValue}
         setSelectValue={setSelectValue}
         saveUserClassification={saveUserClassification}
       />
-
-
-
-      <OutputDisplay responseData={responseData}/>
+      )}
       
+     {showUserPrediction && (
+  <div style={{ display: "flex" }}>
+    <div
+      ref={textRef}
+      style={{
+        fontFamily: "Courier",
+        marginTop: "20px",
+        marginLeft: "80px",
+        fontSize: "24px",
+        padding: "20px",
+        backgroundColor: "#F5F5F5",
+        borderRadius: "10px",
+        boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
+        overflowWrap: "break-word",
+        whiteSpace: "pre-wrap",
+        width: "800px",
+        minHeight: "150px",
+        resize: "none",
+        overflow: "auto",
+      }}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseMove={handleMouseMove}
+    >
+      {inputText}
+    </div>
+    <div>
+      <button
+        style={{
+          fontSize: "24px",
+          padding: "10px 20px",
+          borderRadius: "10px",
+          border: "none",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
+          marginLeft: "10px",
+          marginTop: "80px"
+        }}
+        onClick={handleClickSave}
+      >
+        Save
+      </button>
+    </div>
+  </div>
+)}
+
+      
+
+
+
+      
+      {showUserPrediction && (
+      <button className={styles.button} onClick={resetSession}>
+      Start a New Session
+    </button>
+    )}
+          
     </div>
   );
 }

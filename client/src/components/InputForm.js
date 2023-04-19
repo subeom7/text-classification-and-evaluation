@@ -1,9 +1,10 @@
 import React from "react";
+import styles from './Button.module.css';
 
 const InputForm = ({
   inputText,
   handleInputChange,
-  handleClick,
+  handleClickSubmit,
   fileInputRef,
   handleFileInputChange,
   handleClickZip,
@@ -51,7 +52,8 @@ const InputForm = ({
             style={{ display: "none" }}
             onChange={handleFileUpload}
           />
-          <button
+          <button className={styles.button}
+          
             style={{
               fontSize: "24px",
               padding: "10px 20px",
@@ -78,7 +80,7 @@ const InputForm = ({
             ))}
           </ul>
         </div>
-        <button
+        <button className={styles.button}
           style={{
             fontSize: "24px",
             padding: "10px 20px",
@@ -89,10 +91,12 @@ const InputForm = ({
             boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
             marginLeft: "10px",
           }}
-          onClick={handleClick}
+          onClick={handleClickSubmit}
         >
           Submit
         </button>
+
+        
       </div>
     </div>
   );
