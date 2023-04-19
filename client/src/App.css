@@ -38,9 +38,10 @@
 }
 
 .scrollable-box {
-  width: 50%;
+  width: 400px;
   height: 800px;
   overflow-y: auto;
+  word-wrap: break-word;
   padding: 20px;
   margin-top: 150px;
   margin-left: 20px;

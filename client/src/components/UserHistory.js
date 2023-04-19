@@ -52,7 +52,7 @@ const UserHistory = ({ userHistory, onDeleteHistory, onClearHistory }) => {
           <p><strong>documentID:</strong> {entry._id}</p>
           <p><strong>UserID:</strong> {entry.user_id}</p>
           <p><strong>Input:</strong> {entry.input_text}</p>
-          <p><strong>Classifier Result:</strong> {entry.classifier_result}</p>
+          <p><strong>AI Classification:</strong> {entry.classifier_result}</p>
           <p><strong>AI Highlighted Words:</strong> {entry.important_words}</p>
           <p><strong>User Classification:</strong> {entry.user_result || 'Not provided'}</p>
           <p><strong>User Highlighted Words:</strong> {entry.user_highlight || 'Not provided'}</p>
