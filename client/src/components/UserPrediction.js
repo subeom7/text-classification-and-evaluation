@@ -6,7 +6,7 @@ const UserPrediction = ({ selectValue, setSelectValue }) => {
       style={{ display: "flex", alignItems: "center", flexDirection: "column" }}
     >
       <div>
-      <h2>Your Classification:</h2>
+      <h2>Your Classification: </h2>
       </div>
       <div>
         <select
