@@ -54,6 +54,7 @@ const UserHistory = ({ userHistory, onDeleteHistory, onClearHistory }) => {
           <p><strong>Input:</strong> {entry.input_text}</p>
           <p><strong>Classifier Result:</strong> {entry.classifier_result}</p>
           <p><strong>Important Words:</strong> {entry.important_words}</p>
+          <p><strong>User Classification:</strong> {entry.user_result || 'Not provided'}</p>
           {deleteEntryId === entry._id ? (
             <div>
               <button className={styles.button} onClick={handleConfirmDelete}>
