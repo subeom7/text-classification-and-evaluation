@@ -237,6 +237,7 @@ function App() {
     setFileData([]);
     setFilenameData([]);
     setResults([]);
+    setShowUserPrediction(false);
   }
   
   

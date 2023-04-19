@@ -49,8 +49,8 @@ const UserHistory = ({ userHistory, onDeleteHistory, onClearHistory }) => {
       )}
       {userHistory.map((entry, index) => (
         <div key={index}>
-          <p><strong>documentID:</strong> {entry._id}</p>
-          <p><strong>UserID:</strong> {entry.user_id}</p>
+          <p><strong>Document ID:</strong> {entry._id}</p>
+          <p><strong>User ID:</strong> {entry.user_id}</p>
           <p><strong>Input:</strong> {entry.input_text}</p>
           <p><strong>AI Classification:</strong> {entry.classifier_result}</p>
           <p><strong>AI Highlighted Words:</strong> {entry.important_words}</p>
