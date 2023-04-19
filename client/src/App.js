@@ -137,40 +137,50 @@ function App() {
     }
   }, [user]);
 
-  const handleClick = async () => {
+  const saveUserResult = async (document_id, user_result) => {
     try {
-      const resultsTemp = [];
-
-      for (const input of fileData) {
-        const response = await axios.post("http://localhost:5002/classify", {
-          text: input,
-          user_id: user.sub,
-        });
-
-        const data = response.data;
-        //console.log(data);
-
-        resultsTemp.push(data);
-
-        setUserHistory([
-          ...userHistory,
-          {
-            _id: data.document_id,
-            user_id: user.sub,
-            input_text: inputText,
-            classifier_result: data.result,
-            important_words: data.words,
-          },
-        ]);
-      }
-      setResults(resultsTemp);
-      setResponseData(resultsTemp[0]);
-      console.log(resultsTemp[0]);
+      await axios.post("http://localhost:5002/save_user_result", {
+        document_id,
+        user_result,
+      });
     } catch (error) {
       console.error(error);
     }
   };
 
+  
+
+  const handleClick = async () => {
+    try {
+      const response = await axios.post("http://localhost:5002/classify", {
+        text: inputText,
+        user_id: user.sub,
+        user_result: selectValue,
+      });
+  
+      const data = response.data;
+      console.log(data);
+      setResponseData(data);
+  
+      setUserHistory([
+        ...userHistory,
+        {
+          _id: data.document_id,
+          user_id: user.sub,
+          input_text: inputText,
+          classifier_result: data.result,
+          important_words: data.words,
+          user_prediction: selectValue, 
+        },
+      ]);
+
+      saveUserResult(data.document_id, selectValue);
+      
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
   const handleInputChange = (event) => {
     setInputText(event.target.value);
   };
@@ -198,6 +208,20 @@ function App() {
       console.error(error);
     }
   };
+
+  async function saveUserClassification(document_id, user_result) {
+    const response = await fetch('http://localhost:5002/save_user_result', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ document_id, user_result }),
+    });
+  
+    const data = await response.json();
+    console.log(data);
+  }
+  
   
 
   return (
@@ -286,9 +310,13 @@ function App() {
         {inputText}
       </div>
       <UserPrediction
-        setSelectValue={setSelectValue}
         selectValue={selectValue}
+        setSelectValue={setSelectValue}
+        saveUserClassification={saveUserClassification}
       />
+
+
+
       <OutputDisplay responseData={responseData}/>
       
     </div>

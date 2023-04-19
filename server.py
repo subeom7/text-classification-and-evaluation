@@ -8,6 +8,8 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 import certifi
+from database import save_classification_history, update_classification_history
+
 
 load_dotenv()
 
@@ -55,6 +57,16 @@ def clear_history(user_id):
     history_collection = db.User_History
     history_collection.delete_many({"user_id": user_id})
     return jsonify({"message": "History cleared"})
+
+@app.route('/save_user_result', methods=['POST'])
+def save_user_result():
+    if request.method == 'POST':
+        user_result = request.json['user_result']
+        document_id = request.json['document_id'] 
+
+        update_classification_history(document_id, user_result)  
+        return jsonify({"message": "User result saved"})
+
 
 
 if __name__ == '__main__':
