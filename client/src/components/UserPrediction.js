@@ -6,12 +6,12 @@ const UserPrediction = ({ selectValue, setSelectValue }) => {
       style={{ display: "flex", alignItems: "center", flexDirection: "column" }}
     >
       <div>
-        <h2>Prediction:</h2>
+      <h2>Your Classification:</h2>
       </div>
       <div>
         <select
           value={selectValue}
-          onChange={(event) => {
+          onChange={async (event) => {
             setSelectValue(event.target.value);
             const selectedOption =
               document.getElementById("select-options").options[
