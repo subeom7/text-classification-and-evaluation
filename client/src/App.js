@@ -137,19 +137,6 @@ function App() {
     }
   }, [user]);
 
-  const saveUserResult = async (document_id, user_result) => {
-    try {
-      await axios.post("http://localhost:5002/save_user_result", {
-        document_id,
-        user_result,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  
-
   const handleClick = async () => {
     try {
       const response = await axios.post("http://localhost:5002/classify", {
@@ -170,11 +157,10 @@ function App() {
           input_text: inputText,
           classifier_result: data.result,
           important_words: data.words,
-          user_prediction: selectValue, 
+          user_result: selectValue, 
+          user_highlight: highlightedText,
         },
       ]);
-
-      saveUserResult(data.document_id, selectValue);
       
     } catch (error) {
       console.error(error);

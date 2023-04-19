@@ -12,15 +12,15 @@ MONGODB_URI = os.environ["MONGODB_URI"]
 client = MongoClient(MONGODB_URI, tlsCAFile=certifi.where())
 db = client.User_History
 
-def save_classification_history(user_id, input_text, classifier_result, important_words, user_result):
+def save_classification_history(user_id, input_text, classifier_result, important_words, user_result, user_highlight):
     history_collection = db.User_History
-    history_collection.create_index("user_id")
     history_record = {
         "user_id": user_id,
         "input_text": input_text,
         "classifier_result": classifier_result,
         "important_words": important_words,
-        "user_result": user_result
+        "user_result": user_result,
+        "user_highlight": user_highlight
     }
     result = history_collection.insert_one(history_record)
     return result.inserted_id

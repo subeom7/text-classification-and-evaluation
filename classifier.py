@@ -62,9 +62,10 @@ def classify(input_text, user_id=None):
     output_string = category_map[twenty_train.target_names[predicted_class]]
     document_id = None
     user_result = None
+    user_highlight = None
 
     # Save the classification history for the user if user_id exists
     if user_id:
-        document_id = save_classification_history(user_id, input_text, output_string, important_words, user_result)
+        document_id = save_classification_history(user_id, input_text, output_string, important_words, user_result, user_highlight)
 
     return output_string, important_words, document_id

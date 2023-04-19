@@ -58,16 +58,6 @@ def clear_history(user_id):
     history_collection.delete_many({"user_id": user_id})
     return jsonify({"message": "History cleared"})
 
-@app.route('/save_user_result', methods=['POST'])
-def save_user_result():
-    if request.method == 'POST':
-        user_result = request.json['user_result']
-        document_id = request.json['document_id'] 
-
-        update_classification_history(document_id, user_result)  
-        return jsonify({"message": "User result saved"})
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
