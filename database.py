@@ -29,11 +29,11 @@ def get_classification_history(user_id):
     history_collection = db.User_History
     return list(history_collection.find({"user_id": user_id}))
 
-def update_classification_history(document_id, user_result):
+def update_classification_history(document_id, user_result, user_highlight):
     history_collection = db.User_History
     history_collection.update_one(
         {"_id": ObjectId(document_id)},
-        {"$set": {"user_result": user_result}}
+        {"$set": {"user_result": user_result, "user_highlight": user_highlight}}
     )
     
 def delete_classification_history(user_id, document_id):

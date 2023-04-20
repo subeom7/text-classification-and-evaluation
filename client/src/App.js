@@ -144,6 +144,7 @@ function App() {
         text: inputText,
         user_id: user.sub,
         user_result: selectValue,
+        user_highlight: highlightedText,
       });
   
       const data = response.data;
@@ -157,18 +158,20 @@ function App() {
   };
 
   const handleClickSave = async () => {
+    const commaSeparatedHighlights = highlightedText.join(', ');
     try {
-      const response = await axios.post("http://localhost:5002/classify", {
+      const response = await axios.post("http://localhost:5002/database", {
         text: inputText,
         user_id: user.sub,
         user_result: selectValue,
+        user_highlight: commaSeparatedHighlights,
       });
   
       const data = response.data;
       console.log(data);
       setResponseData(data);
 
-      const commaSeparatedHighlights = highlightedText.join(', ');
+   
   
       setUserHistory([
         ...userHistory,
@@ -269,7 +272,10 @@ function App() {
               {Object.keys(user).length !== 0 && (
                 <button
                   className={styles.button}
-                  onClick={(e) => handleSignOut(e)}
+                  onClick={(e) => {
+                    handleSignOut(e);
+                    resetSession();
+                  }}
                 >
             Sign Out
           </button>
@@ -383,7 +389,7 @@ function App() {
 
 
       
-      {showUserPrediction && (
+      {(
       <button className={styles.button} onClick={resetSession}>
       Start a New Session
     </button>
