@@ -7,7 +7,7 @@ import OutputDisplay from "./components/OutputDisplay";
 import "./App.css";
 import UserPrediction from "./components/UserPrediction";
 import Mark from "mark.js";
-import styles from './components/Button.module.css';
+import styles from "./components/Button.module.css";
 import JSZip from "jszip";
 
 function App() {
@@ -29,6 +29,7 @@ function App() {
   const [filenameData, setFilenameData] = useState([]);
   const [results, setResults] = useState([]);
   const [showUserPrediction, setShowUserPrediction] = useState(false);
+  let [useHandleClick, setUseHandleClick] = useState(false);
 
   function handleFileUpload(event) {
     const file = event.target.files[0];
@@ -50,7 +51,7 @@ function App() {
       }
       setFileData(arrayOfStrings);
       setFilenameData(arrayOfFilenames);
-
+      setUseHandleClick(true);
       setInputText(arrayOfStrings[0]);
     };
 
@@ -59,6 +60,7 @@ function App() {
 
   function handleListItemClick(index, string) {
     setInputText(string);
+    console.log(results[index]);
     setResponseData(results[index]);
   }
 
@@ -139,6 +141,34 @@ function App() {
   }, [user]);
 
   const handleClickSubmit = async () => {
+    console.log(useHandleClick);
+    console.log("file");
+    try {
+      const tempResults = [];
+
+      for (const input of fileData) {
+        const response = await axios.post("http://localhost:5002/classify", {
+          text: input,
+          user_id: user.sub,
+          user_result: selectValue,
+          user_highlight: highlightedText,
+        });
+        const data = response.data;
+        tempResults.push(data);
+        console.log(data);
+      }
+
+      setResults(tempResults);
+      setResponseData(tempResults[0]);
+      setShowUserPrediction(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleClickSubmitText = async () => {
+    console.log(useHandleClick);
+    console.log("text");
     try {
       const response = await axios.post("http://localhost:5002/classify", {
         text: inputText,
@@ -155,10 +185,10 @@ function App() {
     } catch (error) {
       console.error(error);
     }
-  };
+  }
 
   const handleClickSave = async () => {
-    const commaSeparatedHighlights = highlightedText.join(', ');
+    const commaSeparatedHighlights = highlightedText.join(", ");
     try {
       const response = await axios.post("http://localhost:5002/database", {
         text: inputText,
@@ -166,13 +196,11 @@ function App() {
         user_result: selectValue,
         user_highlight: commaSeparatedHighlights,
       });
-  
+
       const data = response.data;
       console.log(data);
       setResponseData(data);
 
-   
-  
       setUserHistory([
         ...userHistory,
         {
@@ -181,35 +209,35 @@ function App() {
           input_text: inputText,
           classifier_result: data.result,
           important_words: data.words,
-          user_result: selectValue, 
+          user_result: selectValue,
           user_highlight: commaSeparatedHighlights,
         },
       ]);
-      
     } catch (error) {
       console.error(error);
     }
   };
-  
+
   const handleInputChange = (event) => {
     setInputText(event.target.value);
   };
 
-  
   const handleImageError = (e) => {
     e.target.onerror = null; // Prevent infinite loop if the default image URL also fails
-    e.target.src = 'https://path/to/your/default/image.png';
+    e.target.src = "https://path/to/your/default/image.png";
   };
 
   const handleDeleteHistory = async (documentId) => {
     try {
-      await axios.delete(`http://localhost:5002/history/delete/${user.sub}/${documentId}`);
+      await axios.delete(
+        `http://localhost:5002/history/delete/${user.sub}/${documentId}`
+      );
       setUserHistory(userHistory.filter((entry) => entry._id !== documentId));
     } catch (error) {
       console.error(error);
     }
   };
-  
+
   const handleClearHistory = async () => {
     try {
       await axios.delete(`http://localhost:5002/history/clear/${user.sub}`);
@@ -220,19 +248,21 @@ function App() {
   };
 
   async function saveUserClassification(document_id, user_result) {
-    const response = await fetch('http://localhost:5002/save_user_result', {
-      method: 'POST',
+    const response = await fetch("http://localhost:5002/save_user_result", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ document_id, user_result }),
     });
-  
+
     const data = await response.json();
     console.log(data);
   }
 
   function resetSession() {
+    
+    setUseHandleClick(false);
     setResponseData("");
     setInputText("");
     setSelectValue("");
@@ -242,9 +272,6 @@ function App() {
     setResults([]);
     setShowUserPrediction(false);
   }
-  
-  
-  
 
   return (
     <div
@@ -260,35 +287,38 @@ function App() {
         <GoogleSignIn setUser={setUser} />
 
         <div className="App">
-        {user && (
-          <div style={{ position: "absolute", top: "10px", right: "10px" }}>
-            <div className={`${styles["user-info"]}`}>
-              <img
-                src={user.picture}
-                onError={handleImageError}
-                style={{ width: "50px", borderRadius: "50%" }}
-              ></img>
-              <h3 style={{ margin: "0" }}>{user.name}</h3>
-              {Object.keys(user).length !== 0 && (
-                <button
-                  className={styles.button}
-                  onClick={(e) => {
-                    handleSignOut(e);
-                    resetSession();
-                  }}
-                >
-            Sign Out
-          </button>
-        )}
-      </div>
-    </div>
-  )}
-</div>
-
+          {user && (
+            <div style={{ position: "absolute", top: "10px", right: "10px" }}>
+              <div className={`${styles["user-info"]}`}>
+                <img
+                  src={user.picture}
+                  onError={handleImageError}
+                  style={{ width: "50px", borderRadius: "50%" }}
+                ></img>
+                <h3 style={{ margin: "0" }}>{user.name}</h3>
+                {Object.keys(user).length !== 0 && (
+                  <button
+                    className={styles.button}
+                    onClick={(e) => {
+                      handleSignOut(e);
+                      resetSession();
+                    }}
+                  >
+                    Sign Out
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
 
         <div style={{ position: "absolute", top: "-100px", left: "10px" }}>
           {Object.keys(user).length !== 0 && (
-            <UserHistory userHistory={userHistory} onDeleteHistory={handleDeleteHistory} onClearHistory={handleClearHistory} />
+            <UserHistory
+              userHistory={userHistory}
+              onDeleteHistory={handleDeleteHistory}
+              onClearHistory={handleClearHistory}
+            />
           )}
         </div>
       </div>
@@ -311,7 +341,7 @@ function App() {
       <div style={{ fontSize: "20px", padding: "10px", marginBottom: "5px" }}>
         "Tesla cuts prices of Model S and Model X vehicles."
       </div>
-      
+
       <InputForm
         inputText={inputText}
         handleInputChange={handleInputChange}
@@ -322,79 +352,72 @@ function App() {
         handleListItemClick={handleListItemClick}
         filenameData={filenameData}
         fileData={fileData}
+        handleClickSubmitText={handleClickSubmitText}
+        useHandleClick={useHandleClick}
       />
-           
-      
+
+      {showUserPrediction && <OutputDisplay responseData={responseData} />}
+
       {showUserPrediction && (
-      <OutputDisplay responseData={responseData}/>
+        <UserPrediction
+          selectValue={selectValue}
+          setSelectValue={setSelectValue}
+          saveUserClassification={saveUserClassification}
+        />
       )}
 
-{showUserPrediction && (
-      <UserPrediction
-        selectValue={selectValue}
-        setSelectValue={setSelectValue}
-        saveUserClassification={saveUserClassification}
-      />
+      {showUserPrediction && (
+        <div style={{ display: "flex" }}>
+          <div
+            ref={textRef}
+            style={{
+              fontFamily: "Courier",
+              marginTop: "20px",
+              marginLeft: "80px",
+              fontSize: "24px",
+              padding: "20px",
+              backgroundColor: "#F5F5F5",
+              borderRadius: "10px",
+              boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
+              overflowWrap: "break-word",
+              whiteSpace: "pre-wrap",
+              width: "800px",
+              minHeight: "150px",
+              resize: "none",
+              overflow: "auto",
+            }}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+          >
+            {inputText}
+          </div>
+          <div>
+            <button
+              style={{
+                fontSize: "24px",
+                padding: "10px 20px",
+                borderRadius: "10px",
+                border: "none",
+                backgroundColor: "#4CAF50",
+                color: "white",
+                boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
+                marginLeft: "10px",
+                marginTop: "80px",
+              }}
+              onClick={handleClickSave}
+            >
+              Save
+            </button>
+          </div>
+        </div>
       )}
-      
-     {showUserPrediction && (
-  <div style={{ display: "flex" }}>
-    <div
-      ref={textRef}
-      style={{
-        fontFamily: "Courier",
-        marginTop: "20px",
-        marginLeft: "80px",
-        fontSize: "24px",
-        padding: "20px",
-        backgroundColor: "#F5F5F5",
-        borderRadius: "10px",
-        boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
-        overflowWrap: "break-word",
-        whiteSpace: "pre-wrap",
-        width: "800px",
-        minHeight: "150px",
-        resize: "none",
-        overflow: "auto",
-      }}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-    >
-      {inputText}
-    </div>
-    <div>
-      <button
-        style={{
-          fontSize: "24px",
-          padding: "10px 20px",
-          borderRadius: "10px",
-          border: "none",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
-          marginLeft: "10px",
-          marginTop: "80px"
-        }}
-        onClick={handleClickSave}
-      >
-        Save
-      </button>
-    </div>
-  </div>
-)}
 
-      
-
-
-
-      
-      {(
-      <button className={styles.button} onClick={resetSession}>
-      Start a New Session
-    </button>
-    )}
-          
+      {
+        <button className={styles.button} onClick={resetSession}>
+          Start a New Session
+        </button>
+      }
     </div>
   );
 }

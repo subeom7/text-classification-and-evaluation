@@ -12,7 +12,10 @@ const InputForm = ({
   handleListItemClick,
   handleFileUpload,
   filenameData,
+  useHandleClick,
+  handleClickSubmitText
 }) => {
+  const handleClick = useHandleClick ?  handleClickSubmit :handleClickSubmitText;
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
 
@@ -91,7 +94,7 @@ const InputForm = ({
             boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
             marginLeft: "10px",
           }}
-          onClick={handleClickSubmit}
+          onClick={handleClick}
         >
           Submit
         </button>
