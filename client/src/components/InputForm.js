@@ -1,5 +1,5 @@
 import React from "react";
-import styles from './Button.module.css';
+import styles from "./Button.module.css";
 
 const InputForm = ({
   inputText,
@@ -13,12 +13,13 @@ const InputForm = ({
   handleFileUpload,
   filenameData,
   useHandleClick,
-  handleClickSubmitText
+  handleClickSubmitText,
 }) => {
-  const handleClick = useHandleClick ?  handleClickSubmit :handleClickSubmitText;
+  const handleClick = useHandleClick
+    ? handleClickSubmit
+    : handleClickSubmitText;
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
-
       <textarea
         id="text-input"
         value={inputText}
@@ -48,61 +49,81 @@ const InputForm = ({
           flexDirection: "column",
         }}
       >
-        <div style={{marginRight: "1px"}}>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: "none" }}
-            onChange={handleFileUpload}
-          />
-          <button className={styles.button}
-          
+        <div style={{ marginRight: "1px" , marginTop: "40px"}}>
+          <div style={{ float: "left" }}>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={handleFileUpload}
+            />
+            <button
+              className={styles.button}
+              style={{
+                fontSize: "24px",
+                padding: "10px 20px",
+                borderRadius: "10px",
+                border: "none",
+                backgroundColor: "#4CAF50",
+                color: "white",
+                boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
+                marginLeft: "10px",
+                marginBottom: "10px",
+              }}
+              onClick={() => fileInputRef.current.click()}
+            >
+              Upload
+            </button>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <button
+                className={styles.button}
+                style={{
+                  fontSize: "24px",
+                  padding: "10px 20px",
+                  borderRadius: "10px",
+                  border: "none",
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
+                  marginLeft: "10px",
+                }}
+                onClick={handleClick}
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+          <div
             style={{
-              fontSize: "24px",
-              padding: "10px 20px",
-              borderRadius: "10px",
-              border: "none",
-              backgroundColor: "#4CAF50",
-              color: "white",
-              boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
+              float: "left",
+              height: "150px",
+              overflow: "auto",
               marginLeft: "10px",
-              marginBottom: "10px",
             }}
-            onClick={() => fileInputRef.current.click()}
           >
-            Upload
-          </button>
-          <ul>
-            {fileData.map((string, index) => (
-              <li
+            <ul>
+              {fileData.map((string, index) => (
+                <li
                 key={index}
                 onClick={() => handleListItemClick(index, string)}
+                style={{
+                  cursor: "pointer",
+                  backgroundColor: "#eee",
+                }}
               >
                 {filenameData[index]}
               </li>
-            ))}
-          </ul>
+              
+              ))}
+            </ul>
+          </div>
+          <div style={{ clear: "both" }}></div>
         </div>
-        <button className={styles.button}
-          style={{
-            fontSize: "24px",
-            padding: "10px 20px",
-            borderRadius: "10px",
-            border: "none",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
-            marginLeft: "10px",
-          }}
-          onClick={handleClick}
-        >
-          Submit
-        </button>
-
-        
       </div>
     </div>
   );
 };
 
 export default InputForm;
+
+

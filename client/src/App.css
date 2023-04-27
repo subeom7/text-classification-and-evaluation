@@ -61,3 +61,8 @@
 .highlight-blue {
   background-color: palegreen;
 }
+
+li:hover {
+  cursor: pointer;
+  background-color: #eee;
+}

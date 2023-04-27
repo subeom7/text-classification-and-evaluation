@@ -31,20 +31,22 @@ function App() {
   const [showUserPrediction, setShowUserPrediction] = useState(false);
   let [useHandleClick, setUseHandleClick] = useState(false);
 
+  
+
   function handleFileUpload(event) {
     const file = event.target.files[0];
     const reader = new FileReader();
-
+  
     reader.onload = async function (event) {
       const zip = await JSZip.loadAsync(event.target.result);
       const arrayOfStrings = [];
       const arrayOfFilenames = [];
-
+  
       for (const filename in zip.files) {
         if (filename.endsWith(".txt")) {
           const textFile = zip.files[filename];
           const text = await textFile.async("text");
-          const strings = text.split("\n");
+          const strings = text.split(/\0/); // split based on end of file character
           arrayOfStrings.push(...strings);
           arrayOfFilenames.push(filename);
         }
@@ -54,9 +56,10 @@ function App() {
       setUseHandleClick(true);
       setInputText(arrayOfStrings[0]);
     };
-
+  
     reader.readAsArrayBuffer(file);
   }
+  
 
   function handleListItemClick(index, string) {
     setInputText(string);
