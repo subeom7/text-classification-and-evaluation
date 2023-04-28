@@ -35,7 +35,7 @@ If the above command does not work, run `npm install` and `pip install -r requir
 
 To "concurrently" run client & server. Make sure to run this command inside of project (***Text-Classification-and-Evaluation***) directory
 
-### `node server.js`
+### `python server.py`
 
 To just run the server.\
 Open [http://localhost:5002](http://localhost:5002) to view it in your browser.
