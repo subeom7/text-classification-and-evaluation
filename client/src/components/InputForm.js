@@ -34,7 +34,7 @@ const InputForm = ({
           color: "black",
           boxShadow: "0px 4px 5px rgba(0, 0, 0, 0.25)",
           marginLeft: "100px",
-          width: "800px",
+          width: "600px",
           minHeight: "150px",
           resize: "none",
           overflow: "auto",
