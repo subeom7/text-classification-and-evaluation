@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, send_from_directory
 from flask_cors import CORS
 from flask.json import JSONEncoder
 from bson import ObjectId
@@ -17,16 +17,23 @@ MONGODB_URI = os.environ["MONGODB_URI"]
 client = MongoClient(MONGODB_URI, tlsCAFile=certifi.where())
 db = client.User_History
 
-
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, ObjectId):
             return str(obj)
         return super(CustomJSONEncoder, self).default(obj)
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="client/build", static_folder="client/build/static")
 app.json_encoder = CustomJSONEncoder
 CORS(app)
+
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve(path):
+    if path != "" and os.path.exists(app.template_folder + "/" + path):
+        return send_from_directory(app.template_folder, path)
+    else:
+        return send_from_directory(app.template_folder, "index.html")
 
 @app.route('/classify', methods=['POST'])
 def classify_text():
@@ -76,8 +83,6 @@ def update_history(user_id, document_id):
     user_highlight = request.json.get('user_highlight')
     update_classification_history(document_id, user_result, user_highlight)
     return jsonify({"message": "History updated"})
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
