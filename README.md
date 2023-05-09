@@ -16,6 +16,10 @@ AI Text Classifier & Evaluator is a web application that utilizes binary text cl
 <a href="https://git-scm.com/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/tandpfun/skill-icons/59059d9d1a2c092696dc66e00931cc1181a4ce1f/icons/Git.svg" width="36" height="36" alt="Git" /></a>
 </p>
 
+# High-Level System Architecture
+
+<img src="https://i.ibb.co/CzhT5pJ/Text-Classification-and-Evaluation-High-Level-System-Architecture.png" alt="Text-Classification-and-Evaluation-High-Level-System-Architecture" border="0">
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
