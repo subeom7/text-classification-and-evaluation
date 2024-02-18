@@ -7,3 +7,4 @@ oauthlib==2.1.0
 Flask-OAuthlib==0.9.6
 pymongo==4.3.3
 python-dotenv==1.0.0
+PyJWT===2.8.0
