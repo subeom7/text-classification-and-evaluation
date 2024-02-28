@@ -48,43 +48,26 @@ def find_important_words(sentence, text_clf, original_class, top_n=5):
     # Return the top N important words and their importance percentage
     return [(re.sub(r'\W', '', word).capitalize()) + "(" + f"{round(diff / total_importance * 100)}%" + ")" for word, diff in sorted_words[:top_n]]
 
-def classify(input_text, user_id, user_result, user_highlight):
-    user_inputs = [input_text]
-
+def process_classification(input_text, user_id=None, user_result=None, user_highlight=None, save_to_db=False):
     # Calculate top_n based on the length of the input text
     num_words = len(input_text.split())
-    topN = max(3, int(num_words * 0.1))  # Set top_n to 10% of the number of words, with a minimum of 1
+    topN = max(3, int(num_words * 0.1))  # Set top_n to 10% of the number of words, with a minimum of 3
 
-    # Perform the classification
+     # Perform the classification
     predicted = text_clf.predict([input_text])
-    predicted_class = int(predicted[0])  # Convert the predicted class to an integer
+    predicted_class = int(predicted[0]) # Convert the predicted class to an integer
     important_words = find_important_words(input_text, text_clf, predicted_class, top_n=topN)
     output_string = category_map[twenty_train.target_names[predicted_class]]
     document_id = None
-    user_result = user_result
-    user_highlight = user_highlight
-
-    return output_string, important_words, document_id
-
-def save_database(input_text, user_id, user_result, user_highlight):
-    user_inputs = [input_text]
-
-    # Calculate top_n based on the length of the input text
-    num_words = len(input_text.split())
-    topN = max(3, int(num_words * 0.1))  # Set top_n to 10% of the number of words, with a minimum of 1
-
-    # Perform the classification
-    predicted = text_clf.predict([input_text])
-    predicted_class = int(predicted[0])  # Convert the predicted class to an integer
-    important_words = find_important_words(input_text, text_clf, predicted_class, top_n=topN)
-    output_string = category_map[twenty_train.target_names[predicted_class]]
-    document_id = None
-    user_result = user_result
-    user_highlight = user_highlight
-    
 
     # Save the classification history for the user if user_id exists
-    if user_id:
+    if save_to_db and user_id:
         document_id = save_classification_history(user_id, input_text, output_string, important_words, user_result, user_highlight)
 
     return output_string, important_words, document_id
+
+def classify(input_text, user_id=None, user_result=None, user_highlight=None):
+    return process_classification(input_text, user_id, user_result, user_highlight, save_to_db=False)
+
+def save_database(input_text, user_id, user_result, user_highlight):
+    return process_classification(input_text, user_id, user_result, user_highlight, save_to_db=True)
