@@ -3,13 +3,31 @@ import jwt_decode from 'jwt-decode';
 
 const GoogleSignIn = ({ setUser }) => {
 
-  function handleCallbackResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
-    var userObject = jwt_decode(response.credential);
-    console.log(userObject);
-    setUser(userObject);
+ 
+function sendTokenToServer(idToken) {
+  fetch('http://localhost:5002/verifyToken', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ token: idToken }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Token verified:', data);
+    setUser(data.user);
     document.getElementById("signInDiv").hidden = true;
-  }
+    localStorage.setItem('jwtToken', idToken); 
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
+}
+
+function handleCallbackResponse(response) {
+  console.log("Encoded JWT ID token: " + response.credential);
+  sendTokenToServer(response.credential);
+}
 
   React.useEffect(() => {
     const initGoogleSignIn = () => {

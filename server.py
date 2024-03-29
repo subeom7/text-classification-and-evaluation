@@ -2,15 +2,16 @@ from flask import Flask, request, jsonify, render_template, send_from_directory,
 from flask_cors import CORS
 from flask.json import JSONEncoder
 from bson import ObjectId
+from jwt import PyJWKClient, decode
 import jwt
+import requests
 import os
 import certifi
 from classifier import text_clf, classify, save_database
-from database import get_classification_history, update_classification_history
+from database import get_classification_history, update_classification_history, delete_classification_history, clear_classification_history
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
-# 환경변수 로드
 load_dotenv()
 
 MONGODB_URI = os.environ["MONGODB_URI"]
@@ -30,21 +31,44 @@ app.json_encoder = CustomJSONEncoder
 CORS(app)
 
 # Decorator that verifies JWT Token
-def token_required(f):
-    def decorated(*args, **kwargs):
-        token = request.headers.get('Authorization')
-        if not token:
-            return jsonify({'message': 'Token is missing!'}), 403
-        try:
-            # remove "Bearer " part from the Bearer Token
-            if token.startswith('Bearer '):
-                token = token[7:]  # Only extract string following "Bearer "
-            jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        except Exception as e:
-            return jsonify({'message': 'Token is invalid or expired!', 'error': str(e)}), 403
-        return f(*args, **kwargs)
-    return decorated
+# def token_required(f):
+#     def decorated(*args, **kwargs):
+#         token = request.headers.get('Authorization')
+#         if not token:
+#             return jsonify({'message': 'Token is missing!'}), 403
+#         try:
+#             # remove "Bearer " part from the Bearer Token
+#             if token.startswith('Bearer '):
+#                 token = token[7:]  # Only extract string following "Bearer "
+#             jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+#         except Exception as e:
+#             return jsonify({'message': 'Token is invalid or expired!', 'error': str(e)}), 403
+#         return f(*args, **kwargs)
+#     return decorated
 
+@app.route('/verifyToken', methods=['POST'])
+def verify_token():
+    token = request.json.get('token')
+    GOOGLE_DISCOVERY_URL = ('https://accounts.google.com/.well-known/openid-configuration')
+    jwks_uri = requests.get(GOOGLE_DISCOVERY_URL).json().get('jwks_uri')
+    
+    jwk_client = PyJWKClient(jwks_uri)
+    signing_key = jwk_client.get_signing_key_from_jwt(token)
+
+    try:
+        decoded_token = decode(
+            token, 
+            signing_key.key, 
+            algorithms=["RS256"], 
+            audience='845464112864-v3o86f5qj5mpbt4jf7qf8ji2p6qjj6lt.apps.googleusercontent.com', 
+            issuer='https://accounts.google.com'
+        )
+        return jsonify({'user': decoded_token, 'message': 'Token verified successfully'}), 200
+    except Exception as e:
+        app.logger.error(f"Token verification failed: {str(e)}")
+        return jsonify({'message': 'Token is invalid or expired!', 'error': str(e)}), 403
+
+    
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve(path):
@@ -54,7 +78,6 @@ def serve(path):
         return send_from_directory(app.template_folder, "index.html")
 
 @app.route('/classify', methods=['POST'])
-@token_required
 def classify_text():
     if request.method == 'POST':
         input_text = request.json['text']
@@ -66,7 +89,6 @@ def classify_text():
         return jsonify(result=output_string, words='\n'.join(important_words), document_id=document_id)
     
 @app.route('/database', methods=['POST'], endpoint='database_post')
-@token_required
 def save_to_database():
     if request.method == 'POST':
         input_text = request.json['text']
@@ -86,15 +108,12 @@ def get_history(user_id):
 
 @app.route('/history/delete/<user_id>/<document_id>', methods=['DELETE'])
 def delete_history(user_id, document_id):
-    history_collection = db.User_History
-    history_collection.delete_one({"user_id": user_id, "_id": ObjectId(document_id)})
+    delete_classification_history(user_id, document_id)
     return jsonify({"message": "History deleted"})
-
 
 @app.route('/history/clear/<user_id>', methods=['DELETE'])
 def clear_history(user_id):
-    history_collection = db.User_History
-    history_collection.delete_many({"user_id": user_id})
+    clear_classification_history(user_id)
     return jsonify({"message": "History cleared"})
 
 @app.route('/history/update/<user_id>/<document_id>', methods=['PUT'])
