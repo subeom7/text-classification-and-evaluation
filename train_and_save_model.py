@@ -14,7 +14,7 @@ twenty_train = fetch_20newsgroups(subset='train', categories=categories, shuffle
 twenty_test = fetch_20newsgroups(subset='test', categories=categories, shuffle=True, random_state=42)
 
 text_clf = Pipeline([
-    ('tfidf', TfidfVectorizer()),
+    ('tfidf', TfidfVectorizer(stop_words='english')),
     ('clf', MultinomialNB())
 ])
 
