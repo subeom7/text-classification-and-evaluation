@@ -1,4 +1,4 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING
 from dotenv import load_dotenv
 from bson.objectid import ObjectId
 import os
@@ -11,6 +11,9 @@ MONGODB_URI = os.environ["MONGODB_URI"]
 
 client = MongoClient(MONGODB_URI, tlsCAFile=certifi.where())
 db = client.User_History
+
+# create index
+db.User_History.create_index([("user_id", ASCENDING)])
 
 def save_classification_history(user_id, input_text, classifier_result, important_words, user_result, user_highlight):
     history_collection = db.User_History
