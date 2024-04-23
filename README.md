@@ -18,7 +18,7 @@ AI Text Classifier & Evaluator is a web application that utilizes binary text cl
 
 # Project Overview and Report
 
-[Project Report](https://vtechworks.lib.vt.edu/server/api/core/bitstreams/02db7ebd-260e-41cd-84f8-eabc1ba282a4/content)
+[Project Overview & Report](https://vtechworks.lib.vt.edu/server/api/core/bitstreams/02db7ebd-260e-41cd-84f8-eabc1ba282a4/content)
 
 # Getting Started with Create React App
 
