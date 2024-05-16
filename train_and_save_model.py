@@ -4,10 +4,10 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.datasets import fetch_20newsgroups
 
-
+# Load data
 categories = ['soc.religion.christian', 'comp.graphics', 'sci.med',
               'sci.electronics', 'sci.space', 'sci.crypt', 'rec.sport.baseball',
               'rec.sport.hockey', 'rec.autos', 'talk.politics.guns']
@@ -29,7 +29,7 @@ param_grid = {
 }
 
 # Perform grid search
-grid_search = GridSearchCV(pipeline, param_grid, cv=5, n_jobs=-1)
+grid_search = GridSearchCV(pipeline, param_grid, cv=5, n_jobs=-1, verbose=10)
 grid_search.fit(twenty_train.data, twenty_train.target)
 
 # Print the best parameters and the best score
@@ -40,6 +40,10 @@ print(f'Best cross-validation score: {grid_search.best_score_:.2f}')
 predicted_test = grid_search.best_estimator_.predict(twenty_test.data)
 test_accuracy = accuracy_score(twenty_test.target, predicted_test)
 print(f'Test accuracy: {test_accuracy:.2f}')
+
+# Detailed evaluation
+print(classification_report(twenty_test.target, predicted_test))
+print(confusion_matrix(twenty_test.target, predicted_test))
 
 # Save the trained model and the twenty_train object to files
 joblib.dump(grid_search.best_estimator_, 'text_classifier.joblib')
