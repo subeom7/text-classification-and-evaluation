@@ -30,22 +30,6 @@ app = Flask(__name__, template_folder="client/build", static_folder="client/buil
 app.json_encoder = CustomJSONEncoder
 CORS(app)
 
-# Decorator that verifies JWT Token
-# def token_required(f):
-#     def decorated(*args, **kwargs):
-#         token = request.headers.get('Authorization')
-#         if not token:
-#             return jsonify({'message': 'Token is missing!'}), 403
-#         try:
-#             # remove "Bearer " part from the Bearer Token
-#             if token.startswith('Bearer '):
-#                 token = token[7:]  # Only extract string following "Bearer "
-#             jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-#         except Exception as e:
-#             return jsonify({'message': 'Token is invalid or expired!', 'error': str(e)}), 403
-#         return f(*args, **kwargs)
-#     return decorated
-
 @app.route('/verifyToken', methods=['POST'])
 def verify_token():
     token = request.json.get('token')
@@ -68,44 +52,30 @@ def verify_token():
         app.logger.error(f"Token verification failed: {str(e)}")
         return jsonify({'message': 'Token is invalid or expired!', 'error': str(e)}), 403
 
-    
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def serve(path):
-    if path != "" and os.path.exists(app.template_folder + "/" + path):
-        return send_from_directory(app.template_folder, path)
-    else:
-        return send_from_directory(app.template_folder, "index.html")
-
 @app.route('/classify', methods=['POST'])
 def classify_text():
-    if request.method == 'POST':
-        input_text = request.json['text']
-        user_result = request.json.get('user_result')
-        user_highlight = request.json.get('user_highlight')
-        user_id = request.json.get('user_id', None)
-        output_string, important_words, document_id = classify(input_text, user_id, user_result, user_highlight) 
+    input_text = request.json['text']
+    user_result = request.json.get('user_result')
+    user_highlight = request.json.get('user_highlight')
+    user_id = request.json.get('user_id', None)
+    output_string, important_words, document_id = classify(input_text, user_id, user_result, user_highlight) 
+    return jsonify(result=output_string, words='\n'.join(important_words), document_id=document_id)
 
-        return jsonify(result=output_string, words='\n'.join(important_words), document_id=document_id)
-    
-@app.route('/database', methods=['POST'], endpoint='database_post')
-def save_to_database():
+@app.route('/database', methods=['POST', 'GET'])
+def handle_database():
     if request.method == 'POST':
         input_text = request.json['text']
         user_result = request.json.get('user_result')
         user_highlight = request.json.get('user_highlight')
         user_id = request.json.get('user_id', None)
         output_string, important_words, document_id = save_database(input_text, user_id, user_result, user_highlight) 
-
         return jsonify(result=output_string, words='\n'.join(important_words), document_id=document_id)
-
     
-@app.route('/history/<user_id>', methods=['GET'])
-def get_history(user_id):
-    user_history = get_classification_history(user_id)
-    print("User history:", user_history)
-    return jsonify(user_history)
-
+    elif request.method == 'GET':
+        user_id = request.args.get('user_id')
+        user_history = get_classification_history(user_id)
+        return jsonify(user_history)
+    
 @app.route('/history/delete/<user_id>/<document_id>', methods=['DELETE'])
 def delete_history(user_id, document_id):
     delete_classification_history(user_id, document_id)
@@ -115,13 +85,6 @@ def delete_history(user_id, document_id):
 def clear_history(user_id):
     clear_classification_history(user_id)
     return jsonify({"message": "History cleared"})
-
-@app.route('/history/update/<user_id>/<document_id>', methods=['PUT'])
-def update_history(user_id, document_id):
-    user_result = request.json.get('user_result')
-    user_highlight = request.json.get('user_highlight')
-    update_classification_history(document_id, user_result, user_highlight)
-    return jsonify({"message": "History updated"})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
